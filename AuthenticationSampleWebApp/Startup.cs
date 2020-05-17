@@ -1,7 +1,10 @@
 using System.Text;
+using AuthenticationSampleWebApp.Models;
+using AuthenticationSampleWebApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +24,8 @@ namespace AuthenticationSampleWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<StudentDbService, SqlServerDbService>();
+            services.AddTransient<StudentDbService, SqlServerDbService>();
             //HTTP Basic
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -37,8 +42,13 @@ namespace AuthenticationSampleWebApp
                     });
 
             //services.AddAuthentication("AuthenticationBasic")
-              //      .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("AuthenticationBasic", null);
+            //      .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("AuthenticationBasic", null);
 
+            services.AddDbContext<StudentDbContext>(options =>
+            {
+                options.UseSqlServer(@"Data Source=DESKTOP-5G2FL6J\SQLEXPRESS;Initial Catalog=APBD_4;Integrated Security=True");
+            }
+            );
             services.AddControllers()
                     .AddXmlSerializerFormatters();
             

@@ -1,5 +1,6 @@
 ﻿using AuthenticationSampleWebApp.DTOs;
 using AuthenticationSampleWebApp.DTOs.Responses;
+using AuthenticationSampleWebApp.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using System.Collections.Generic;
@@ -259,6 +260,33 @@ namespace AuthenticationSampleWebApp.Services
                 else
                     return null;
             }
-        }        
+        }
+        public void UpdateStudent(Student UpdateStudent)
+        {
+            var DbContext = new StudentDbContext();
+            var Student = DbContext.Students.Where(st => st.Id == UpdateStudent.Id).FirstOrDefault();
+            if (Student == null)
+                throw new Exception("Nie ma takiego studenta");
+            Student.FirstName = UpdateStudent.FirstName != null ? UpdateStudent.FirstName : Student.FirstName;
+            Student.LastName = UpdateStudent.LastName != null ? UpdateStudent.LastName : Student.LastName;
+            Student.BirthDate = UpdateStudent.BirthDate.Equals(null) ? UpdateStudent.BirthDate : Student.BirthDate;
+            DbContext.SaveChanges();
+        }
+
+        public void DeleteStudent(int Id)
+        {
+            var DbContext = new StudentDbContext();         
+            var delStudent = new Student()
+            {
+                Id = Id
+            };         
+            DbContext.Remove(delStudent);
+            DbContext.SaveChanges();
+        }
+
+        public IEnumerable<Student> GetStudents()
+        {            
+            return new StudentDbContext().Students.ToList();
+        }
     }
 }
